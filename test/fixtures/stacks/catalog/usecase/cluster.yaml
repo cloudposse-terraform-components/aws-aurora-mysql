@@ -1,0 +1,43 @@
+components:
+  terraform:
+    aurora-mysql/cluster:
+      metadata:
+        component: aurora-mysql
+      vars:
+        name: rds
+        mysql_deletion_protection: false
+        mysql_storage_encrypted: true
+        aurora_mysql_engine: "aurora-mysql"
+        allowed_cidr_blocks: []
+          # all automation
+          # - 10.128.0.0/22
+          # all corp
+          # - 10.128.16.0/22
+        eks_component_names: []
+        #  - eks/eks
+        # https://docs.aws.amazon.com/AmazonRDS/latest/AuroraMySQLReleaseNotes/AuroraMySQL.Updates.3020.html
+        # aws rds describe-db-engine-versions --engine aurora-mysql --query 'DBEngineVersions[].EngineVersion'
+        publicly_accessible: true
+        aurora_mysql_engine_version: "8.0.mysql_aurora.3.02.0"
+        # engine and cluster family are notoriously hard to find.
+        # If you know the engine version (example here is "8.0.mysql_aurora.3.02.0"), use Engine and DBParameterGroupFamily from:
+        #    aws rds describe-db-engine-versions --engine aurora-mysql --query "DBEngineVersions[]" | \
+        #    jq '.[] | select(.EngineVersion == "8.0.mysql_aurora.3.02.0") |
+        #       { Engine: .Engine, EngineVersion: .EngineVersion, DBParameterGroupFamily: .DBParameterGroupFamily }'
+        #
+        #    Returns:
+        #    {
+        #       "Engine": "aurora-mysql",
+        #       "EngineVersion": "8.0.mysql_aurora.3.02.0",
+        #       "DBParameterGroupFamily": "aurora-mysql8.0"
+        #     }
+        aurora_mysql_cluster_family: "aurora-mysql8.0"
+        mysql_name: shared
+        # 1 writer, 1 reader
+        mysql_cluster_size: 2
+        mysql_admin_user: "" # generate random username
+        mysql_admin_password: "" # generate random password
+        mysql_db_name: "" # generate random db name
+        # https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Concepts.DBInstanceClass.html
+        mysql_instance_type: "db.t3.medium"
+        mysql_skip_final_snapshot: false

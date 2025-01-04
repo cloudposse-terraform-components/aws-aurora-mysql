@@ -1,0 +1,5 @@
+components:
+  terraform:
+    dns-primary:
+      vars:
+        domain_names: []

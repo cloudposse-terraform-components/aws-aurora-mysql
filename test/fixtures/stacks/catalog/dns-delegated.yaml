@@ -1,0 +1,8 @@
+components:
+  terraform:
+    dns-delegated:
+      vars:
+        name: "dns-delegated"
+        zone_config: []
+        request_acm_certificate: false
+        dns_private_zone_enabled: false

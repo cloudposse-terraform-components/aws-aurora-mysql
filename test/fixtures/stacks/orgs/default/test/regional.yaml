@@ -1,0 +1,12 @@
+import:
+  - orgs/default/test/_defaults
+  - catalog/vpc
+  - catalog/usecase/cluster
+#  - catalog/usecase/private
+#  - catalog/usecase/public
+#  - catalog/usecase/with_ipam
+#  - catalog/usecase/with_flow_logs  
+
+terraform:
+  vars:
+    environment: ue2

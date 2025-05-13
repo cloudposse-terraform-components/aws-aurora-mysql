@@ -24,14 +24,19 @@ output "aurora_mysql_master_hostname" {
 }
 
 output "aurora_mysql_master_password" {
-  value       = local.mysql_db_enabled ? "Password for admin user ${module.aurora_mysql.master_username} is stored in SSM at ${local.mysql_admin_password_key}" : null
+  value       = local.mysql_db_enabled ? "Password for admin user ${module.aurora_mysql.master_username} is stored in ${var.secrets_store_type} at ${local.mysql_admin_password_key}" : null
   description = "Location of admin password in SSM"
   sensitive   = true
 }
 
 output "aurora_mysql_master_password_ssm_key" {
-  value       = local.mysql_db_enabled ? local.mysql_admin_password_key : null
+  value       = local.ssm_enabled && local.mysql_db_enabled ? local.mysql_admin_password_key : null
   description = "SSM key for admin password"
+}
+
+output "aurora_mysql_master_password_asm_key" {
+  value       = local.asm_enabled && local.mysql_db_enabled ? local.mysql_admin_password_key : null
+  description = "ASM key for admin password"
 }
 
 output "aurora_mysql_master_username" {

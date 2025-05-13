@@ -1,7 +1,7 @@
 resource "aws_secretsmanager_secret" "default" {
   count = local.asm_enabled ? 1 : 0
 
-  name        = local.mysql_admin_user_key
+  name        = local.mysql_admin_password_key
   description = format("%s admin creds", module.cluster.id)
 
   # policy                  = "{}"

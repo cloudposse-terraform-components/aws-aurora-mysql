@@ -225,3 +225,14 @@ variable "vpc_component_name" {
   default     = "vpc"
   description = "The name of the VPC component"
 }
+
+variable "secrets_store_type" {
+  type        = string
+  description = "Secret Store type for Datadog API and app keys. Valid values: `SSM`, `ASM`"
+  default     = "SSM"
+
+  validation {
+    condition     = var.secrets_store_type == "ASM" || var.secrets_store_type == "SSM"
+    error_message = "secrets_store_type must be either 'ASM' or 'SSM'."
+  }
+}

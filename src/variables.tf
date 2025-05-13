@@ -228,7 +228,7 @@ variable "vpc_component_name" {
 
 variable "secrets_store_type" {
   type        = string
-  description = "Secret Store type for Datadog API and app keys. Valid values: `SSM`, `ASM`"
+  description = "Secret Store type to save database credentials. Valid values: `SSM`, `ASM`"
   default     = "SSM"
 
   validation {

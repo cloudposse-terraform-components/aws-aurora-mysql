@@ -1,6 +1,9 @@
 locals {
   enabled = module.this.enabled
 
+  asm_enabled = local.enabled && var.secrets_store_type == "ASM"
+  ssm_enabled = local.enabled && var.secrets_store_type == "SSM"
+
   vpc_outputs           = module.vpc.outputs
   dns_delegated_outputs = module.dns-delegated.outputs
   vpc_id                = local.vpc_outputs.vpc_id

@@ -1,3 +1,7 @@
+locals {
+  db_port = 3306
+}
+
 module "aurora_mysql" {
   source  = "cloudposse/rds-cluster/aws"
   version = "2.1.0"
@@ -14,7 +18,7 @@ module "aurora_mysql" {
   instance_type       = var.mysql_instance_type
 
   db_name        = local.mysql_db_name
-  db_port        = 3306
+  db_port        = local.db_port
   admin_password = local.mysql_admin_password
   admin_user     = local.mysql_admin_user
 

@@ -21,7 +21,7 @@ locals {
     },
     {
       name        = format("%s/%s", local.ssm_path_prefix, "db_port")
-      value       = local.db_port
+      value       = tostring(local.db_port)
       description = "Aurora MySQL DB Master TCP port"
       type        = "String"
       overwrite   = true

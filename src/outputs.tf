@@ -25,7 +25,7 @@ output "aurora_mysql_master_hostname" {
 
 output "aurora_mysql_master_password" {
   value       = local.mysql_db_enabled ? "Password for admin user ${module.aurora_mysql.master_username} is stored in ${var.secrets_store_type} at ${local.mysql_admin_password_key}" : null
-  description = "Location of admin password in SSM"
+  description = "Location of admin password"
   sensitive   = true
 }
 

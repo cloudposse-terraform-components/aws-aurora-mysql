@@ -1,6 +1,6 @@
 module "aurora_mysql" {
   source  = "cloudposse/rds-cluster/aws"
-  version = "1.18.0"
+  version = "2.1.0"
 
   attributes = [var.mysql_name]
 

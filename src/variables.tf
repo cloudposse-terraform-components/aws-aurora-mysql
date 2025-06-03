@@ -41,6 +41,11 @@ variable "mysql_db_port" {
   type        = number
   description = "Database port"
   default     = 3306
+
+  validation {
+    condition     = var.mysql_db_port >= 1 && var.mysql_db_port <= 65535
+    error_message = "mysql_db_port must be between 1 and 65535."
+  }
 }
 
 variable "mysql_admin_user" {
@@ -238,7 +243,7 @@ variable "secrets_store_type" {
   default     = "SSM"
 
   validation {
-    condition     = var.secrets_store_type == "ASM" || var.secrets_store_type == "SSM"
-    error_message = "secrets_store_type must be either 'ASM' or 'SSM'."
+    condition     = contains(["SSM", "ASM"], var.secrets_store_type)
+    error_message = "secrets_store_type must be one of: SSM, ASM."
   }
 }

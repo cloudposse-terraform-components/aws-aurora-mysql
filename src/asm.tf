@@ -14,7 +14,7 @@ resource "aws_secretsmanager_secret" "default" {
 resource "aws_secretsmanager_secret_version" "default" {
   count = local.asm_enabled ? 1 : 0
 
-  secret_id     = one(aws_secretsmanager_secret.default[*].id)
+  secret_id = one(aws_secretsmanager_secret.default[*].id)
   secret_string = jsonencode({
     cluster_domain = local.cluster_domain
     db_host        = module.aurora_mysql.master_host

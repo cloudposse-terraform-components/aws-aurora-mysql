@@ -18,7 +18,7 @@ resource "aws_secretsmanager_secret_version" "default" {
   secret_string = jsonencode({
     cluster_domain = local.cluster_domain
     db_host        = module.aurora_mysql.master_host
-    db_port        = local.db_port
+    db_port        = module.aurora_mysql.port
     cluster_name   = module.aurora_mysql.cluster_identifier
     username       = local.mysql_admin_user
     password       = local.mysql_admin_password

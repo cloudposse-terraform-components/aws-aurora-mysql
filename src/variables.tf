@@ -33,8 +33,14 @@ variable "mysql_name" {
 
 variable "mysql_db_name" {
   type        = string
-  description = "Database name (default is not to create a database"
+  description = "Database name (default is not to create a database)"
   default     = ""
+}
+
+variable "mysql_db_port" {
+  type        = number
+  description = "Database port"
+  default     = 3306
 }
 
 variable "mysql_admin_user" {

@@ -21,7 +21,7 @@ locals {
     },
     {
       name        = format("%s/%s", local.ssm_path_prefix, "db_port")
-      value       = "3306"
+      value       = module.aurora_mysql.port
       description = "Aurora MySQL DB Master TCP port"
       type        = "String"
       overwrite   = true
@@ -74,6 +74,8 @@ data "aws_ssm_parameter" "password" {
 module "parameter_store_write" {
   source  = "cloudposse/ssm-parameter-store/aws"
   version = "0.13.0"
+
+  enabled = local.ssm_enabled
 
   # kms_arn will only be used for SecureString parameters
   kms_arn = module.kms_key_rds.key_arn

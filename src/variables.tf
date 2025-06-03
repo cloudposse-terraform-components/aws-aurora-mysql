@@ -33,8 +33,19 @@ variable "mysql_name" {
 
 variable "mysql_db_name" {
   type        = string
-  description = "Database name (default is not to create a database"
+  description = "Database name (default is not to create a database)"
   default     = ""
+}
+
+variable "mysql_db_port" {
+  type        = number
+  description = "Database port"
+  default     = 3306
+
+  validation {
+    condition     = var.mysql_db_port >= 1 && var.mysql_db_port <= 65535
+    error_message = "mysql_db_port must be between 1 and 65535."
+  }
 }
 
 variable "mysql_admin_user" {
@@ -224,4 +235,15 @@ variable "vpc_component_name" {
   type        = string
   default     = "vpc"
   description = "The name of the VPC component"
+}
+
+variable "secrets_store_type" {
+  type        = string
+  description = "Secret Store type to save database credentials. Valid values: `SSM`, `ASM`"
+  default     = "SSM"
+
+  validation {
+    condition     = contains(["SSM", "ASM"], var.secrets_store_type)
+    error_message = "secrets_store_type must be one of: SSM, ASM."
+  }
 }

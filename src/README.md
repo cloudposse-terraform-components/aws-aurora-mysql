@@ -201,6 +201,8 @@ Reploying the component should show no changes. For example,
 
 | Name | Type |
 |------|------|
+| [aws_secretsmanager_secret.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
+| [aws_secretsmanager_secret_version.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [random_password.mysql_admin_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
 | [random_pet.mysql_admin_user](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) | resource |
 | [random_pet.mysql_db_name](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) | resource |
@@ -241,7 +243,8 @@ Reploying the component should show no changes. For example,
 | <a name="input_mysql_backup_retention_period"></a> [mysql\_backup\_retention\_period](#input\_mysql\_backup\_retention\_period) | Number of days for which to retain backups | `number` | `3` | no |
 | <a name="input_mysql_backup_window"></a> [mysql\_backup\_window](#input\_mysql\_backup\_window) | Daily time range during which the backups happen | `string` | `"07:00-09:00"` | no |
 | <a name="input_mysql_cluster_size"></a> [mysql\_cluster\_size](#input\_mysql\_cluster\_size) | MySQL cluster size | `string` | `2` | no |
-| <a name="input_mysql_db_name"></a> [mysql\_db\_name](#input\_mysql\_db\_name) | Database name (default is not to create a database | `string` | `""` | no |
+| <a name="input_mysql_db_name"></a> [mysql\_db\_name](#input\_mysql\_db\_name) | Database name (default is not to create a database) | `string` | `""` | no |
+| <a name="input_mysql_db_port"></a> [mysql\_db\_port](#input\_mysql\_db\_port) | Database port | `number` | `3306` | no |
 | <a name="input_mysql_deletion_protection"></a> [mysql\_deletion\_protection](#input\_mysql\_deletion\_protection) | Set to `true` to protect the database from deletion | `string` | `true` | no |
 | <a name="input_mysql_enabled_cloudwatch_logs_exports"></a> [mysql\_enabled\_cloudwatch\_logs\_exports](#input\_mysql\_enabled\_cloudwatch\_logs\_exports) | List of log types to export to cloudwatch. The following log types are supported: audit, error, general, slowquery | `list(string)` | <pre>[<br/>  "audit",<br/>  "error",<br/>  "general",<br/>  "slowquery"<br/>]</pre> | no |
 | <a name="input_mysql_instance_type"></a> [mysql\_instance\_type](#input\_mysql\_instance\_type) | EC2 instance type for RDS MySQL cluster | `string` | `"db.t3.medium"` | no |
@@ -258,6 +261,7 @@ Reploying the component should show no changes. For example,
 | <a name="input_regex_replace_chars"></a> [regex\_replace\_chars](#input\_regex\_replace\_chars) | Terraform regular expression (regex) string.<br/>Characters matching the regex will be removed from the ID elements.<br/>If not set, `"/[^a-zA-Z0-9-]/"` is used to remove all characters other than hyphens, letters and digits. | `string` | `null` | no |
 | <a name="input_region"></a> [region](#input\_region) | AWS Region | `string` | n/a | yes |
 | <a name="input_replication_source_identifier"></a> [replication\_source\_identifier](#input\_replication\_source\_identifier) | ARN of a source DB cluster or DB instance if this DB cluster is to be created as a Read Replica.<br/>If this value is empty and replication is enabled, remote state will attempt to find<br/>a matching cluster in the Primary DB Cluster's region | `string` | `""` | no |
+| <a name="input_secrets_store_type"></a> [secrets\_store\_type](#input\_secrets\_store\_type) | Secret Store type to save database credentials. Valid values: `SSM`, `ASM` | `string` | `"SSM"` | no |
 | <a name="input_ssm_password_source"></a> [ssm\_password\_source](#input\_ssm\_password\_source) | If `var.ssm_passwords_enabled` is `true`, DB user passwords will be retrieved from SSM using<br/>`var.ssm_password_source` and the database username. If this value is not set,<br/>a default path will be created using the SSM path prefix and ID of the associated Aurora Cluster. | `string` | `""` | no |
 | <a name="input_ssm_path_prefix"></a> [ssm\_path\_prefix](#input\_ssm\_path\_prefix) | SSM path prefix | `string` | `"rds"` | no |
 | <a name="input_stage"></a> [stage](#input\_stage) | ID element. Usually used to indicate role, e.g. 'prod', 'staging', 'source', 'build', 'test', 'deploy', 'release' | `string` | `null` | no |
@@ -274,7 +278,8 @@ Reploying the component should show no changes. For example,
 | <a name="output_aurora_mysql_cluster_name"></a> [aurora\_mysql\_cluster\_name](#output\_aurora\_mysql\_cluster\_name) | Aurora MySQL cluster identifier |
 | <a name="output_aurora_mysql_endpoint"></a> [aurora\_mysql\_endpoint](#output\_aurora\_mysql\_endpoint) | Aurora MySQL endpoint |
 | <a name="output_aurora_mysql_master_hostname"></a> [aurora\_mysql\_master\_hostname](#output\_aurora\_mysql\_master\_hostname) | Aurora MySQL DB master hostname |
-| <a name="output_aurora_mysql_master_password"></a> [aurora\_mysql\_master\_password](#output\_aurora\_mysql\_master\_password) | Location of admin password in SSM |
+| <a name="output_aurora_mysql_master_password"></a> [aurora\_mysql\_master\_password](#output\_aurora\_mysql\_master\_password) | Location of admin password |
+| <a name="output_aurora_mysql_master_password_asm_key"></a> [aurora\_mysql\_master\_password\_asm\_key](#output\_aurora\_mysql\_master\_password\_asm\_key) | ASM key for admin password |
 | <a name="output_aurora_mysql_master_password_ssm_key"></a> [aurora\_mysql\_master\_password\_ssm\_key](#output\_aurora\_mysql\_master\_password\_ssm\_key) | SSM key for admin password |
 | <a name="output_aurora_mysql_master_username"></a> [aurora\_mysql\_master\_username](#output\_aurora\_mysql\_master\_username) | Aurora MySQL username for the master DB user |
 | <a name="output_aurora_mysql_reader_endpoint"></a> [aurora\_mysql\_reader\_endpoint](#output\_aurora\_mysql\_reader\_endpoint) | Aurora MySQL reader endpoint |

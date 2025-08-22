@@ -7,8 +7,9 @@ tags:
 
 # Component: `aurora-mysql`
 
-This component is responsible for provisioning Aurora MySQL RDS clusters. It seeds relevant database information
+This component provisions Amazon Aurora MySQL RDS clusters and seeds relevant database information
 (hostnames, username, password, etc.) into AWS SSM Parameter Store.
+## Usage
 
 ## Usage
 
@@ -154,18 +155,18 @@ https://github.com/hashicorp/terraform-provider-aws/issues/6749
 Instead, promote the Replicate cluster with the AWS CLI command:
 `aws rds promote-read-replica-db-cluster --db-cluster-identifier <identifier>`
 
-After promoting the replica, update the stack configuration to prevent future Terrafrom runs from re-enabling
+After promoting the replica, update the stack configuration to prevent future Terraform runs from re-enabling
 replication. In this example, modify `stacks/catalog/aurora-mysql/replica/defaults.yaml`
 
 ```yaml
 is_promoted_read_replica: true
 ```
 
-Reploying the component should show no changes. For example,
+Re-deploying the component should show no changes. For example,
 `atmos terraform apply aurora-mysql/dev -s platform-use2-dev`
 
-<!-- prettier-ignore-start -->
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+
+<!-- markdownlint-disable -->
 ## Requirements
 
 | Name | Version |
@@ -286,12 +287,17 @@ Reploying the component should show no changes. For example,
 | <a name="output_aurora_mysql_replicas_hostname"></a> [aurora\_mysql\_replicas\_hostname](#output\_aurora\_mysql\_replicas\_hostname) | Aurora MySQL replicas hostname |
 | <a name="output_cluster_domain"></a> [cluster\_domain](#output\_cluster\_domain) | Cluster DNS name |
 | <a name="output_kms_key_arn"></a> [kms\_key\_arn](#output\_kms\_key\_arn) | KMS key ARN for Aurora MySQL |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
-<!-- prettier-ignore-end -->
+<!-- markdownlint-restore -->
+
+
 
 ## References
 
-- [cloudposse/terraform-aws-components](https://github.com/cloudposse/terraform-aws-components/tree/main/modules/aurora-mysql) -
-  Cloud Posse's upstream component
+
+- [cloudposse-terraform-components](https://github.com/orgs/cloudposse-terraform-components/repositories) - Cloud Posse's upstream component
+
+
+
 
 [<img src="https://cloudposse.com/logo-300x69.svg" height="32" align="right"/>](https://cpco.io/homepage?utm_source=github&utm_medium=readme&utm_campaign=cloudposse-terraform-components/aws-aurora-mysql&utm_content=)
+

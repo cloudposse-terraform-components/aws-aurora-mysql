@@ -51,8 +51,6 @@ This component provisions Amazon Aurora MySQL RDS clusters and seeds relevant da
 
 ## Usage
 
-## Usage
-
 **Stack Level**: Regional
 
 Here's an example for how to use this component.

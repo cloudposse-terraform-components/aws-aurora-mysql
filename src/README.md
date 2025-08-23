@@ -11,8 +11,6 @@ This component provisions Amazon Aurora MySQL RDS clusters and seeds relevant da
 (hostnames, username, password, etc.) into AWS SSM Parameter Store.
 ## Usage
 
-## Usage
-
 **Stack Level**: Regional
 
 Here's an example for how to use this component.

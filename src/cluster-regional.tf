@@ -45,5 +45,7 @@ module "aurora_mysql" {
 
   replication_source_identifier = local.replication_source_identifier
 
+  iam_database_authentication_enabled = var.iam_database_authentication_enabled
+
   context = module.this.context
 }

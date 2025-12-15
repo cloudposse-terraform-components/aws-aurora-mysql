@@ -247,3 +247,9 @@ variable "secrets_store_type" {
     error_message = "secrets_store_type must be one of: SSM, ASM."
   }
 }
+
+variable "iam_database_authentication_enabled" {
+  description = "Enable IAM database authentication"
+  type        = bool
+  default     = false
+}

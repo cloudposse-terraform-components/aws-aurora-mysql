@@ -268,11 +268,17 @@ variable "enhanced_monitoring_attributes" {
 
 variable "rds_monitoring_interval" {
   type        = number
-  description = "The interval, in seconds, between points when enhanced monitoring metrics are collected for the DB instance. To disable collecting Enhanced Monitoring metrics, specify 0. The default is 0. Valid Values: 0, 1, 5, 10, 15, 30, 60"
+  description = "The interval, in seconds, between points when enhanced monitoring metrics are collected for the DB instance. To disable collecting Enhanced Monitoring metrics, specify 0. The default is 60. Valid Values: 0, 1, 5, 10, 15, 30, 60"
   default     = 60
 
   validation {
     condition     = contains([0, 1, 5, 10, 15, 30, 60], var.rds_monitoring_interval)
     error_message = "rds_monitoring_interval must be one of: 0, 1, 5, 10, 15, 30, 60."
   }
+}
+
+variable "enhanced_monitoring_role_enabled" {
+  type        = bool
+  description = "A boolean flag to enable/disable the creation of the enhanced monitoring IAM role. If set to `false`, the module will not create a new role and will use `rds_monitoring_role_arn` for enhanced monitoring"
+  default     = true
 }

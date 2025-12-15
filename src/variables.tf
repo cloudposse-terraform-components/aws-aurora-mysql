@@ -276,9 +276,3 @@ variable "rds_monitoring_interval" {
     error_message = "rds_monitoring_interval must be one of: 0, 1, 5, 10, 15, 30, 60."
   }
 }
-
-variable "enhanced_monitoring_role_enabled" {
-  type        = bool
-  description = "A boolean flag to enable/disable the creation of the enhanced monitoring IAM role. If set to `false`, the module will not create a new role and will use `rds_monitoring_role_arn` for enhanced monitoring"
-  default     = true
-}

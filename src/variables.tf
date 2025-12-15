@@ -270,4 +270,9 @@ variable "rds_monitoring_interval" {
   type        = number
   description = "The interval, in seconds, between points when enhanced monitoring metrics are collected for the DB instance. To disable collecting Enhanced Monitoring metrics, specify 0. The default is 0. Valid Values: 0, 1, 5, 10, 15, 30, 60"
   default     = 60
+
+  validation {
+    condition     = contains([0, 1, 5, 10, 15, 30, 60], var.rds_monitoring_interval)
+    error_message = "rds_monitoring_interval must be one of: 0, 1, 5, 10, 15, 30, 60."
+  }
 }

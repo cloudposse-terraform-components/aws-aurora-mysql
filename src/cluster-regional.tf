@@ -46,9 +46,9 @@ module "aurora_mysql" {
   replication_source_identifier = local.replication_source_identifier
 
   iam_database_authentication_enabled = var.iam_database_authentication_enabled
-  enhanced_monitoring_role_enabled     = var.enhanced_monitoring_role_enabled
-  enhanced_monitoring_attributes       = var.enhanced_monitoring_attributes
-  rds_monitoring_interval              = var.rds_monitoring_interval
+  enhanced_monitoring_role_enabled    = var.enhanced_monitoring_role_enabled
+  enhanced_monitoring_attributes      = var.enhanced_monitoring_attributes
+  rds_monitoring_interval             = var.rds_monitoring_interval
 
   context = module.this.context
 }

@@ -31,11 +31,11 @@ locals {
 
   # Do not create a DB & DB resources if Read Replication is enabled
   mysql_db_enabled     = local.enabled && !local.is_read_replica
-  mysql_db_name        = length(var.mysql_db_name) > 0 ? var.mysql_db_name : join("", random_pet.mysql_db_name.*.id)
-  mysql_admin_user     = length(var.mysql_admin_user) > 0 ? var.mysql_admin_user : join("", random_pet.mysql_admin_user.*.id)
+  mysql_db_name        = length(var.mysql_db_name) > 0 ? var.mysql_db_name : join("", random_pet.mysql_db_name[*].id)
+  mysql_admin_user     = length(var.mysql_admin_user) > 0 ? var.mysql_admin_user : join("", random_pet.mysql_admin_user[*].id)
   fetch_admin_password = local.mysql_db_enabled && length(var.ssm_password_source) > 0
   mysql_admin_password = local.fetch_admin_password ? data.aws_ssm_parameter.password[0].value : (
-    length(var.mysql_admin_password) > 0 ? var.mysql_admin_password : join("", random_password.mysql_admin_password.*.result)
+    length(var.mysql_admin_password) > 0 ? var.mysql_admin_password : join("", random_password.mysql_admin_password[*].result)
   )
 
   cluster_domain    = trimprefix(module.aurora_mysql.endpoint, "${module.aurora_mysql.cluster_identifier}.cluster-")

@@ -351,7 +351,7 @@ variable "proxy_auth" {
     Configuration blocks with authorization mechanisms to connect to the associated database instances or clusters.
     Each block supports:
     - auth_scheme: The type of authentication that the proxy uses for connections. Valid values: SECRETS
-    - client_password_auth_type: The type of authentication the proxy uses for connections from clients. Valid values: MYSQL_NATIVE_PASSWORD, POSTGRES_SCRAM_SHA_256, POSTGRES_MD5, SQL_SERVER_AUTHENTICATION
+    - client_password_auth_type: The type of authentication the proxy uses for connections from clients. For Aurora MySQL, the only valid value is MYSQL_NATIVE_PASSWORD
     - description: A user-specified description about the authentication used by a proxy
     - iam_auth: Whether to require or disallow AWS IAM authentication. Valid values: DISABLED, REQUIRED, OPTIONAL
     - secret_arn: The ARN of the Secrets Manager secret containing the database credentials
@@ -373,11 +373,11 @@ variable "proxy_iam_auth" {
 variable "proxy_client_password_auth_type" {
   type        = string
   default     = null
-  description = "The type of authentication the proxy uses for connections from clients. Valid values: MYSQL_NATIVE_PASSWORD, POSTGRES_SCRAM_SHA_256, POSTGRES_MD5, SQL_SERVER_AUTHENTICATION"
+  description = "The type of authentication the proxy uses for connections from clients. For Aurora MySQL, the only valid value is MYSQL_NATIVE_PASSWORD. Set to null to let AWS choose the default."
 
   validation {
-    condition     = var.proxy_client_password_auth_type == null || contains(["MYSQL_NATIVE_PASSWORD", "POSTGRES_SCRAM_SHA_256", "POSTGRES_MD5", "SQL_SERVER_AUTHENTICATION"], var.proxy_client_password_auth_type)
-    error_message = "Valid values for proxy_client_password_auth_type are: MYSQL_NATIVE_PASSWORD, POSTGRES_SCRAM_SHA_256, POSTGRES_MD5, SQL_SERVER_AUTHENTICATION."
+    condition     = var.proxy_client_password_auth_type == null || var.proxy_client_password_auth_type == "MYSQL_NATIVE_PASSWORD"
+    error_message = "For Aurora MySQL, the only valid value for proxy_client_password_auth_type is MYSQL_NATIVE_PASSWORD."
   }
 }
 

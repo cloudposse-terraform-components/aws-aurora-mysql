@@ -1,11 +1,13 @@
 package test
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/cloudposse/test-helpers/pkg/atmos"
 	helper "github.com/cloudposse/test-helpers/pkg/atmos/component-helper"
+	"github.com/gruntwork-io/terratest/modules/aws"
 	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/stretchr/testify/assert"
 )
@@ -17,31 +19,41 @@ type ComponentSuite struct {
 func (s *ComponentSuite) TestBasic() {
 	const component = "aurora-mysql/basic"
 	const stack = "default-test"
+	const awsRegion = "us-east-2"
 
-	clusterName := strings.ToLower(random.UniqueId())
+	mysqlName := strings.ToLower(random.UniqueId())
 
 	defer s.DestroyAtmosComponent(s.T(), component, stack, nil)
 	inputs := map[string]interface{}{
-		"mysql_name":             clusterName,
-		"mysql_db_name":          "mydb",
-		"mysql_admin_user":       "admin",
-		"mysql_db_port":          3306,
-		"publicly_accessible":    true,
-		"allowed_cidr_blocks":    []string{"0.0.0.0/0"},
+		"mysql_name":                mysqlName,
+		"mysql_db_name":             "mydb",
+		"mysql_admin_user":          "admin",
+		"mysql_db_port":             3306,
+		"publicly_accessible":       true,
+		"allowed_cidr_blocks":       []string{"0.0.0.0/0"},
 		"mysql_deletion_protection": false,
 		"mysql_skip_final_snapshot": true,
 	}
 	componentInstance, _ := s.DeployAtmosComponent(s.T(), component, stack, &inputs)
 	assert.NotNil(s.T(), componentInstance)
 
-	clusterName_ := atmos.Output(s.T(), componentInstance, "aurora_mysql_cluster_name")
-	assert.NotEmpty(s.T(), clusterName_)
+	clusterName := atmos.Output(s.T(), componentInstance, "aurora_mysql_cluster_name")
+	assert.NotEmpty(s.T(), clusterName)
 
+	delegatedDnsOptions := s.GetAtmosOptions("dns-delegated", stack, nil)
+	delegatedDomainName := atmos.Output(s.T(), delegatedDnsOptions, "default_domain_name")
+	delegatedDomainZoneId := atmos.Output(s.T(), delegatedDnsOptions, "default_dns_zone_id")
+
+	// cluster_subdomain = mysql_name + "." + name (when mysql_name != "")
+	// cluster_dns_name  = "master." + cluster_subdomain
+	componentName := componentInstance.Vars["name"].(string)
 	masterHostname := atmos.Output(s.T(), componentInstance, "aurora_mysql_master_hostname")
-	assert.NotEmpty(s.T(), masterHostname)
+	expectedMasterHostname := fmt.Sprintf("master.%s.%s.%s", mysqlName, componentName, delegatedDomainName)
+	assert.Equal(s.T(), expectedMasterHostname, masterHostname)
 
 	replicasHostname := atmos.Output(s.T(), componentInstance, "aurora_mysql_replicas_hostname")
-	assert.NotEmpty(s.T(), replicasHostname)
+	expectedReplicasHostname := fmt.Sprintf("readers.%s.%s.%s", mysqlName, componentName, delegatedDomainName)
+	assert.Equal(s.T(), expectedReplicasHostname, replicasHostname)
 
 	endpoint := atmos.Output(s.T(), componentInstance, "aurora_mysql_endpoint")
 	assert.NotEmpty(s.T(), endpoint)
@@ -52,7 +64,30 @@ func (s *ComponentSuite) TestBasic() {
 	kmsKeyArn := atmos.Output(s.T(), componentInstance, "kms_key_arn")
 	assert.NotEmpty(s.T(), kmsKeyArn)
 
-	// Verify proxy outputs are nil/empty when proxy is not enabled
+	// Verify Route53 DNS record for master hostname points at the cluster endpoint
+	masterHostnameDNSRecord := aws.GetRoute53Record(s.T(), delegatedDomainZoneId, masterHostname, "CNAME", awsRegion)
+	assert.Equal(s.T(), endpoint, *masterHostnameDNSRecord.ResourceRecords[0].Value)
+
+	// Verify the password SSM key is written and the password can be retrieved
+	passwordSSMKey := atmos.Output(s.T(), componentInstance, "aurora_mysql_master_password_ssm_key")
+	assert.NotEmpty(s.T(), passwordSSMKey)
+
+	adminUserPassword := aws.GetParameter(s.T(), awsRegion, passwordSSMKey)
+	adminUsername := atmos.Output(s.T(), componentInstance, "aurora_mysql_master_username")
+	dbPort := int32(inputs["mysql_db_port"].(int))
+	dbName := inputs["mysql_db_name"].(string)
+
+	// Verify DB connectivity through the cluster endpoint, master hostname, and replicas hostname
+	schemaExists := aws.GetWhetherSchemaExistsInRdsMySqlInstance(s.T(), endpoint, dbPort, adminUsername, adminUserPassword, dbName)
+	assert.True(s.T(), schemaExists)
+
+	schemaExists = aws.GetWhetherSchemaExistsInRdsMySqlInstance(s.T(), masterHostname, dbPort, adminUsername, adminUserPassword, dbName)
+	assert.True(s.T(), schemaExists)
+
+	schemaExists = aws.GetWhetherSchemaExistsInRdsMySqlInstance(s.T(), replicasHostname, dbPort, adminUsername, adminUserPassword, dbName)
+	assert.True(s.T(), schemaExists)
+
+	// Verify proxy outputs are empty/nil when proxy is not enabled
 	proxyEndpoint := atmos.Output(s.T(), componentInstance, "proxy_endpoint")
 	assert.Empty(s.T(), proxyEndpoint)
 

@@ -1,21 +1,18 @@
 locals {
-  proxy_enabled = local.enabled && var.proxy_enabled
+  proxy_enabled = local.enabled && var.proxy_enabled && !local.is_read_replica
 
   # Aurora MySQL always uses the MYSQL engine family for RDS Proxy
   proxy_engine_family = "MYSQL"
 
-  # Get the secret ARN for authentication - must be explicitly provided for Aurora MySQL
-  proxy_secret_arn = var.proxy_secret_arn
-
   # Build auth configuration
   proxy_auth = var.proxy_auth != null ? var.proxy_auth : (
-    local.proxy_secret_arn != null ? [
+    var.proxy_secret_arn != null ? [
       {
         auth_scheme               = "SECRETS"
         client_password_auth_type = var.proxy_client_password_auth_type
         description               = "Authenticate using Secrets Manager"
         iam_auth                  = var.proxy_iam_auth
-        secret_arn                = local.proxy_secret_arn
+        secret_arn                = var.proxy_secret_arn
         username                  = null
       }
     ] : []
@@ -104,5 +101,19 @@ check "proxy_engine_supported" {
   assert {
     condition     = !var.proxy_enabled || contains(["aurora", "aurora-mysql"], var.aurora_mysql_engine)
     error_message = "RDS Proxy only supports the MYSQL engine family. The engine '${var.aurora_mysql_engine}' is not supported."
+  }
+}
+
+check "proxy_auth_required" {
+  assert {
+    condition     = !var.proxy_enabled || var.proxy_auth != null || var.proxy_secret_arn != null
+    error_message = "When proxy_enabled is true, either proxy_auth or proxy_secret_arn must be provided."
+  }
+}
+
+check "proxy_read_replica_unsupported" {
+  assert {
+    condition     = !var.proxy_enabled || !var.is_read_replica
+    error_message = "RDS Proxy cannot be enabled on a read replica cluster. Set proxy_enabled = false when is_read_replica = true."
   }
 }

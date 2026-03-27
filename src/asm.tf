@@ -15,12 +15,18 @@ resource "aws_secretsmanager_secret_version" "default" {
   count = local.asm_enabled ? 1 : 0
 
   secret_id = one(aws_secretsmanager_secret.default[*].id)
-  secret_string = jsonencode({
-    cluster_domain = local.cluster_domain
-    db_host        = module.aurora_mysql.master_host
-    db_port        = module.aurora_mysql.port
-    cluster_name   = module.aurora_mysql.cluster_identifier
-    username       = local.mysql_admin_user
-    password       = local.mysql_admin_password
-  })
+  secret_string = jsonencode(merge(
+    {
+      cluster_domain = local.cluster_domain
+      db_host        = module.aurora_mysql.master_host
+      db_port        = module.aurora_mysql.port
+      cluster_name   = module.aurora_mysql.cluster_identifier
+      username       = local.mysql_admin_user
+      password       = local.mysql_admin_password
+    },
+    local.proxy_enabled ? {
+      proxy_endpoint = module.rds_proxy[0].proxy_endpoint
+      proxy_host     = var.proxy_dns_enabled ? aws_route53_record.proxy[0].fqdn : module.rds_proxy[0].proxy_endpoint
+    } : {}
+  ))
 }

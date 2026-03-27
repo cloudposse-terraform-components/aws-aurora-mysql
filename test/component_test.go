@@ -46,7 +46,7 @@ func (s *ComponentSuite) TestBasic() {
 
 	// cluster_subdomain = mysql_name + "." + name (when mysql_name != "")
 	// cluster_dns_name  = "master." + cluster_subdomain
-	componentName := componentInstance.Vars["name"].(string)
+	componentName := fmt.Sprintf("%v", componentInstance.Vars["name"])
 	masterHostname := atmos.Output(s.T(), componentInstance, "aurora_mysql_master_hostname")
 	expectedMasterHostname := fmt.Sprintf("master.%s.%s.%s", mysqlName, componentName, delegatedDomainName)
 	assert.Equal(s.T(), expectedMasterHostname, masterHostname)
@@ -68,12 +68,27 @@ func (s *ComponentSuite) TestBasic() {
 	masterHostnameDNSRecord := aws.GetRoute53Record(s.T(), delegatedDomainZoneId, masterHostname, "CNAME", awsRegion)
 	assert.Equal(s.T(), endpoint, *masterHostnameDNSRecord.ResourceRecords[0].Value)
 
-	// Verify the password SSM key is written and the password can be retrieved
-	passwordSSMKey := atmos.Output(s.T(), componentInstance, "aurora_mysql_master_password_ssm_key")
-	assert.NotEmpty(s.T(), passwordSSMKey)
+	// Verify the expected number of SSM parameters were written:
+	// 4 default + 1 replicas (cluster_size > 0) + 2 admin = 7
+	ssmKeyPaths := atmos.OutputList(s.T(), componentInstance, "ssm_key_paths")
+	assert.Equal(s.T(), 7, len(ssmKeyPaths))
+
+	adminUsername := atmos.Output(s.T(), componentInstance, "aurora_mysql_master_username")
+	assert.Equal(s.T(), inputs["mysql_admin_user"], adminUsername)
+
+	// Verify config_map has the expected connection details
+	configMap := map[string]interface{}{}
+	atmos.OutputStruct(s.T(), componentInstance, "config_map", &configMap)
+	assert.Equal(s.T(), clusterName, configMap["cluster"])
+	assert.Equal(s.T(), inputs["mysql_db_name"], configMap["database"])
+	assert.Equal(s.T(), masterHostname, configMap["hostname"])
+	assert.EqualValues(s.T(), inputs["mysql_db_port"], configMap["port"])
+	assert.Equal(s.T(), adminUsername, configMap["username"])
+
+	passwordSSMKey, ok := configMap["password_ssm_key"].(string)
+	assert.True(s.T(), ok, "password_ssm_key should be a string")
 
 	adminUserPassword := aws.GetParameter(s.T(), awsRegion, passwordSSMKey)
-	adminUsername := atmos.Output(s.T(), componentInstance, "aurora_mysql_master_username")
 	dbPort := int32(inputs["mysql_db_port"].(int))
 	dbName := inputs["mysql_db_name"].(string)
 

@@ -65,6 +65,30 @@ output "kms_key_arn" {
   description = "KMS key ARN for Aurora MySQL"
 }
 
+output "ssm_key_paths" {
+  value       = module.parameter_store_write.names
+  description = "Names (key paths) of all SSM parameters stored for this cluster"
+}
+
+output "config_map" {
+  value = local.enabled ? {
+    cluster          = module.aurora_mysql.cluster_identifier
+    database         = local.mysql_db_name
+    hostname         = module.aurora_mysql.master_host
+    port             = var.mysql_db_port
+    endpoint         = module.aurora_mysql.endpoint
+    username         = module.aurora_mysql.master_username
+    password_ssm_key = local.ssm_enabled && local.mysql_db_enabled ? local.mysql_admin_password_key : null
+  } : null
+  description = "Map containing information pertinent to a MySQL client configuration."
+  sensitive   = true
+}
+
+output "security_group_id" {
+  value       = module.aurora_mysql.security_group_id
+  description = "The security group ID of the Aurora MySQL cluster"
+}
+
 # RDS Proxy Outputs
 output "proxy_id" {
   value       = one(module.rds_proxy[*].proxy_id)

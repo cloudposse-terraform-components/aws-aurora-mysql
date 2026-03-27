@@ -77,7 +77,8 @@ locals {
     }
   ] : []
 
-  parameter_write = local.mysql_db_enabled ? concat(local.default_parameters, local.cluster_parameters, local.admin_user_parameters, local.proxy_parameters) : concat(local.default_parameters, local.cluster_parameters, local.proxy_parameters)
+  all_parameters  = concat(local.default_parameters, local.cluster_parameters, local.proxy_parameters)
+  parameter_write = local.mysql_db_enabled ? concat(local.all_parameters, local.admin_user_parameters) : local.all_parameters
 }
 
 data "aws_ssm_parameter" "password" {

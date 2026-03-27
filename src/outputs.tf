@@ -1,5 +1,5 @@
 output "aurora_mysql_cluster_arn" {
-  value       = module.aurora_mysql.arn
+  value       = local.enabled ? module.aurora_mysql.arn : null
   description = "The ARN of Aurora cluster"
 }
 
@@ -53,6 +53,11 @@ output "aurora_mysql_reader_endpoint" {
 output "aurora_mysql_replicas_hostname" {
   value       = local.enabled ? module.aurora_mysql.replicas_host : null
   description = "Aurora MySQL replicas hostname"
+}
+
+output "instance_endpoints" {
+  value       = local.enabled ? module.aurora_mysql.instance_endpoints : null
+  description = "List of Aurora MySQL instance endpoints"
 }
 
 output "cluster_domain" {

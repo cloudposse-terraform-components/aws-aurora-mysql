@@ -84,6 +84,7 @@ func (s *ComponentSuite) TestBasic() {
 	assert.Equal(s.T(), masterHostname, configMap["hostname"])
 	assert.EqualValues(s.T(), inputs["mysql_db_port"], configMap["port"])
 	assert.Equal(s.T(), adminUsername, configMap["username"])
+	assert.Equal(s.T(), endpoint, configMap["endpoint"])
 
 	passwordSSMKey, ok := configMap["password_ssm_key"].(string)
 	assert.True(s.T(), ok, "password_ssm_key should be a string")
@@ -108,6 +109,10 @@ func (s *ComponentSuite) TestBasic() {
 
 	proxySecurityGroupId := atmos.Output(s.T(), componentInstance, "proxy_security_group_id")
 	assert.Empty(s.T(), proxySecurityGroupId)
+
+	// Verify cluster security group ID is populated
+	clusterSecurityGroupId := atmos.Output(s.T(), componentInstance, "security_group_id")
+	assert.NotEmpty(s.T(), clusterSecurityGroupId)
 
 	s.DriftTest(component, stack, &inputs)
 }

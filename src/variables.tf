@@ -58,6 +58,7 @@ variable "mysql_admin_password" {
   type        = string
   description = "MySQL password for the admin user"
   default     = ""
+  sensitive   = true
 }
 
 # https://aws.amazon.com/rds/RDS/pricing

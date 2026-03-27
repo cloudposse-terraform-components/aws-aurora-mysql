@@ -10,6 +10,7 @@ import (
 	"github.com/gruntwork-io/terratest/modules/aws"
 	"github.com/gruntwork-io/terratest/modules/random"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type ComponentSuite struct {
@@ -34,8 +35,9 @@ func (s *ComponentSuite) TestBasic() {
 		"mysql_deletion_protection": false,
 		"mysql_skip_final_snapshot": true,
 	}
-	componentInstance, _ := s.DeployAtmosComponent(s.T(), component, stack, &inputs)
-	assert.NotNil(s.T(), componentInstance)
+	componentInstance, err := s.DeployAtmosComponent(s.T(), component, stack, &inputs)
+	require.NoError(s.T(), err)
+	require.NotNil(s.T(), componentInstance)
 
 	clusterName := atmos.Output(s.T(), componentInstance, "aurora_mysql_cluster_name")
 	assert.NotEmpty(s.T(), clusterName)

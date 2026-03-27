@@ -159,3 +159,13 @@ output "proxy_security_group_id" {
   value       = one(module.proxy_security_group[*].id)
   description = "The security group ID of the RDS Proxy"
 }
+
+output "proxy_security_group_arn" {
+  value       = one(module.proxy_security_group[*].arn)
+  description = "The ARN of the security group created for the RDS Proxy"
+}
+
+output "proxy_security_group_name" {
+  value       = one(module.proxy_security_group[*].name)
+  description = "The name of the security group created for the RDS Proxy"
+}

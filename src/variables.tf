@@ -59,6 +59,15 @@ variable "mysql_admin_password" {
   description = "MySQL password for the admin user"
   default     = ""
   sensitive   = true
+
+  validation {
+    condition = (
+      length(var.mysql_admin_password) == 0 ||
+      (length(var.mysql_admin_password) >= 8 &&
+      length(var.mysql_admin_password) <= 41)
+    )
+    error_message = "Per the RDS API, master password must be between 8 and 41 characters for Aurora MySQL. If an empty string is provided then a random password will be used."
+  }
 }
 
 # https://aws.amazon.com/rds/RDS/pricing
@@ -335,7 +344,12 @@ variable "proxy_existing_iam_role_arn" {
 variable "proxy_secret_arn" {
   type        = string
   default     = null
-  description = "The ARN of the secret in AWS Secrets Manager that contains the database credentials. Required if proxy_auth is not provided"
+  description = <<-EOT
+    The ARN of the secret in AWS Secrets Manager that contains the database credentials.
+    Required when `proxy_enabled` is `true` and `proxy_auth` is not provided.
+    If both `proxy_auth` and `proxy_secret_arn` are null and `proxy_enabled` is `true`,
+    the proxy will be created with an empty auth configuration, which will cause an AWS API error.
+  EOT
 }
 
 variable "proxy_auth" {

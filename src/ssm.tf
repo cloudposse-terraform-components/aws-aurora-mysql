@@ -60,7 +60,24 @@ locals {
     }
   ]
 
-  parameter_write = local.mysql_db_enabled ? concat(local.default_parameters, local.cluster_parameters, local.admin_user_parameters) : concat(local.default_parameters, local.cluster_parameters)
+  proxy_parameters = local.proxy_enabled ? [
+    {
+      name        = format("%s/%s", local.ssm_path_prefix, "proxy_endpoint")
+      value       = module.rds_proxy[0].proxy_endpoint
+      description = "RDS Proxy endpoint"
+      type        = "String"
+      overwrite   = true
+    },
+    {
+      name        = format("%s/%s", local.ssm_path_prefix, "proxy_host")
+      value       = var.proxy_dns_enabled ? aws_route53_record.proxy[0].fqdn : module.rds_proxy[0].proxy_endpoint
+      description = "RDS Proxy hostname (DNS name if enabled, otherwise raw endpoint)"
+      type        = "String"
+      overwrite   = true
+    }
+  ] : []
+
+  parameter_write = local.mysql_db_enabled ? concat(local.default_parameters, local.cluster_parameters, local.admin_user_parameters, local.proxy_parameters) : concat(local.default_parameters, local.cluster_parameters, local.proxy_parameters)
 }
 
 data "aws_ssm_parameter" "password" {

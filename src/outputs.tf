@@ -156,6 +156,6 @@ output "proxy_iam_role_arn" {
 }
 
 output "proxy_security_group_id" {
-  value       = one(aws_security_group.proxy[*].id)
+  value       = one(module.proxy_security_group[*].id)
   description = "The security group ID of the RDS Proxy"
 }

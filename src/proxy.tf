@@ -23,27 +23,38 @@ locals {
 }
 
 # Dedicated security group for RDS Proxy
-resource "aws_security_group" "proxy" {
+# Uses cloudposse/security-group to enable create_before_destroy lifecycle safety
+module "proxy_security_group" {
+  source  = "cloudposse/security-group/aws"
+  version = "2.2.0"
+
   count = local.proxy_enabled ? 1 : 0
 
-  name        = "${module.cluster.id}-proxy"
-  description = "Security group for RDS Proxy"
-  vpc_id      = local.vpc_id
+  vpc_id                     = local.vpc_id
+  security_group_description = var.proxy_security_group_description
+  create_before_destroy      = var.proxy_security_group_create_before_destroy
+  preserve_security_group_id = var.proxy_preserve_security_group_id
 
-  tags = module.cluster.tags
-}
+  # Only allow explicit egress to the Aurora cluster; no unrestricted egress
+  allow_all_egress = false
 
-# Egress rule: Allow proxy to connect to Aurora cluster on database port
-resource "aws_security_group_rule" "proxy_egress_to_cluster" {
-  count = local.proxy_enabled ? 1 : 0
+  rules = concat(
+    [
+      {
+        key                      = "egress_to_cluster"
+        type                     = "egress"
+        from_port                = var.mysql_db_port
+        to_port                  = var.mysql_db_port
+        protocol                 = "tcp"
+        source_security_group_id = module.aurora_mysql.security_group_id
+        description              = "Allow proxy to connect to Aurora cluster"
+      }
+    ],
+    var.proxy_additional_security_group_rules
+  )
 
-  type                     = "egress"
-  from_port                = var.mysql_db_port
-  to_port                  = var.mysql_db_port
-  protocol                 = "tcp"
-  source_security_group_id = module.aurora_mysql.security_group_id
-  security_group_id        = aws_security_group.proxy[0].id
-  description              = "Allow proxy to connect to Aurora cluster"
+  attributes = ["proxy"]
+  context    = module.cluster.context
 }
 
 # Ingress rule on Aurora cluster: Allow connections from proxy security group
@@ -54,7 +65,7 @@ resource "aws_security_group_rule" "cluster_ingress_from_proxy" {
   from_port                = var.mysql_db_port
   to_port                  = var.mysql_db_port
   protocol                 = "tcp"
-  source_security_group_id = aws_security_group.proxy[0].id
+  source_security_group_id = module.proxy_security_group[0].id
   security_group_id        = module.aurora_mysql.security_group_id
   description              = "Allow connections from RDS Proxy"
 }
@@ -71,7 +82,7 @@ module "rds_proxy" {
   engine_family = local.proxy_engine_family
   # RDS Proxy must always be in private subnets for security
   vpc_subnet_ids               = local.private_subnet_ids
-  vpc_security_group_ids       = [aws_security_group.proxy[0].id]
+  vpc_security_group_ids       = [module.proxy_security_group[0].id]
   debug_logging                = var.proxy_debug_logging
   idle_client_timeout          = var.proxy_idle_client_timeout
   require_tls                  = var.proxy_require_tls
@@ -83,6 +94,9 @@ module "rds_proxy" {
   iam_role_attributes          = var.proxy_iam_role_attributes
   existing_iam_role_arn        = var.proxy_existing_iam_role_arn
   kms_key_id                   = var.mysql_storage_encrypted ? module.kms_key_rds.key_arn : null
+  proxy_create_timeout         = var.proxy_create_timeout
+  proxy_update_timeout         = var.proxy_update_timeout
+  proxy_delete_timeout         = var.proxy_delete_timeout
 
   context = module.cluster.context
 }
@@ -95,25 +109,4 @@ resource "aws_route53_record" "proxy" {
   type    = "CNAME"
   ttl     = 60
   records = [module.rds_proxy[0].proxy_endpoint]
-}
-
-check "proxy_engine_supported" {
-  assert {
-    condition     = !var.proxy_enabled || contains(["aurora", "aurora-mysql"], var.aurora_mysql_engine)
-    error_message = "RDS Proxy only supports the MYSQL engine family. The engine '${var.aurora_mysql_engine}' is not supported."
-  }
-}
-
-check "proxy_auth_required" {
-  assert {
-    condition     = !var.proxy_enabled || var.proxy_auth != null || var.proxy_secret_arn != null
-    error_message = "When proxy_enabled is true, either proxy_auth or proxy_secret_arn must be provided."
-  }
-}
-
-check "proxy_read_replica_unsupported" {
-  assert {
-    condition     = !var.proxy_enabled || !var.is_read_replica
-    error_message = "RDS Proxy cannot be enabled on a read replica cluster. Set proxy_enabled = false when is_read_replica = true."
-  }
 }

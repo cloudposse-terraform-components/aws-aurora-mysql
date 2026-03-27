@@ -1,0 +1,32 @@
+components:
+  terraform:
+    aurora-mysql/disabled:
+      metadata:
+        component: target
+      vars:
+        enabled: false
+        name: db
+        tags:
+          Team: sre
+          Service: aurora-mysql
+
+        mysql_deletion_protection: false
+        mysql_storage_encrypted: true
+        aurora_mysql_engine: aurora-mysql
+        aurora_mysql_engine_version: "8.0.mysql_aurora.3.08.1"
+        aurora_mysql_cluster_family: aurora-mysql8.0
+        publicly_accessible: true
+
+        mysql_cluster_size: 2
+        mysql_instance_type: db.t3.medium
+
+        mysql_admin_user: admin
+        mysql_admin_password: ""
+        mysql_db_name: mydb
+        mysql_db_port: 3306
+        mysql_skip_final_snapshot: true
+
+        performance_insights_enabled: false
+        eks_component_names: []
+        secrets_store_type: SSM
+        allow_ingress_from_vpc_accounts: []

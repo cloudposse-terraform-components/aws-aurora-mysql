@@ -220,39 +220,32 @@ Re-deploying the component should show no changes. For example,
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.0, < 6.0.0 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | >= 2.2 |
 | <a name="requirement_utils"></a> [utils](#requirement\_utils) | >= 2.0.0, < 3.0.0 |
 
-## Providers
-
-| Name | Version |
-|------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.0, < 6.0.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | >= 2.2 |
-
 ## Modules
 
 | Name | Source | Version |
-|------|--------|---------|
-| <a name="module_aurora_mysql"></a> [aurora\_mysql](#module\_aurora\_mysql) | cloudposse/rds-cluster/aws | 2.4.0 |
+| ---- | ------ | ------- |
+| <a name="module_aurora_mysql"></a> [aurora\_mysql](#module\_aurora\_mysql) | cloudposse/rds-cluster/aws | 2.6.0 |
 | <a name="module_cluster"></a> [cluster](#module\_cluster) | cloudposse/label/null | 0.25.0 |
-| <a name="module_dns-delegated"></a> [dns-delegated](#module\_dns-delegated) | cloudposse/stack-config/yaml//modules/remote-state | 2.0.0 |
-| <a name="module_eks"></a> [eks](#module\_eks) | cloudposse/stack-config/yaml//modules/remote-state | 2.0.0 |
+| <a name="module_dns-delegated"></a> [dns-delegated](#module\_dns-delegated) | cloudposse/stack-config/yaml//modules/remote-state | 2.0.1 |
+| <a name="module_eks"></a> [eks](#module\_eks) | cloudposse/stack-config/yaml//modules/remote-state | 2.0.1 |
 | <a name="module_iam_roles"></a> [iam\_roles](#module\_iam\_roles) | ../account-map/modules/iam-roles | n/a |
 | <a name="module_kms_key_rds"></a> [kms\_key\_rds](#module\_kms\_key\_rds) | cloudposse/kms-key/aws | 0.12.2 |
 | <a name="module_parameter_store_write"></a> [parameter\_store\_write](#module\_parameter\_store\_write) | cloudposse/ssm-parameter-store/aws | 0.13.0 |
-| <a name="module_primary_cluster"></a> [primary\_cluster](#module\_primary\_cluster) | cloudposse/stack-config/yaml//modules/remote-state | 2.0.0 |
+| <a name="module_primary_cluster"></a> [primary\_cluster](#module\_primary\_cluster) | cloudposse/stack-config/yaml//modules/remote-state | 2.0.1 |
 | <a name="module_this"></a> [this](#module\_this) | cloudposse/label/null | 0.25.0 |
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | cloudposse/stack-config/yaml//modules/remote-state | 2.0.0 |
-| <a name="module_vpc_ingress"></a> [vpc\_ingress](#module\_vpc\_ingress) | cloudposse/stack-config/yaml//modules/remote-state | 2.0.0 |
+| <a name="module_vpc"></a> [vpc](#module\_vpc) | cloudposse/stack-config/yaml//modules/remote-state | 2.0.1 |
+| <a name="module_vpc_ingress"></a> [vpc\_ingress](#module\_vpc\_ingress) | cloudposse/stack-config/yaml//modules/remote-state | 2.0.1 |
 
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [aws_secretsmanager_secret.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret) | resource |
 | [aws_secretsmanager_secret_version.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/secretsmanager_secret_version) | resource |
 | [random_password.mysql_admin_password](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
@@ -266,7 +259,7 @@ Re-deploying the component should show no changes. For example,
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_additional_tag_map"></a> [additional\_tag\_map](#input\_additional\_tag\_map) | Additional key-value pairs to add to each map in `tags_as_list_of_maps`. Not added to `tags` or `id`.<br/>This is for some rare cases where resources want additional configuration of tags<br/>and therefore take a list of maps with tag key, value, and additional configuration. | `map(string)` | `{}` | no |
 | <a name="input_allow_ingress_from_vpc_accounts"></a> [allow\_ingress\_from\_vpc\_accounts](#input\_allow\_ingress\_from\_vpc\_accounts) | List of account contexts to pull VPC ingress CIDR and add to cluster security group.<br/><br/>e.g.<br/>{<br/>  environment = "ue2",<br/>  stage       = "auto",<br/>  tenant      = "core"<br/>}<br/><br/>Defaults to the "vpc" component in the given account | <pre>list(object({<br/>    vpc         = optional(string, "vpc")<br/>    environment = optional(string)<br/>    stage       = optional(string)<br/>    tenant      = optional(string)<br/>  }))</pre> | `[]` | no |
 | <a name="input_allowed_cidr_blocks"></a> [allowed\_cidr\_blocks](#input\_allowed\_cidr\_blocks) | List of CIDR blocks to be allowed to connect to the RDS cluster | `list(string)` | `[]` | no |
@@ -328,7 +321,7 @@ Re-deploying the component should show no changes. For example,
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_aurora_mysql_cluster_arn"></a> [aurora\_mysql\_cluster\_arn](#output\_aurora\_mysql\_cluster\_arn) | The ARN of Aurora cluster |
 | <a name="output_aurora_mysql_cluster_id"></a> [aurora\_mysql\_cluster\_id](#output\_aurora\_mysql\_cluster\_id) | The ID of Aurora cluster |
 | <a name="output_aurora_mysql_cluster_name"></a> [aurora\_mysql\_cluster\_name](#output\_aurora\_mysql\_cluster\_name) | Aurora MySQL cluster identifier |
